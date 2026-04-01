@@ -1,0 +1,21 @@
+# Ignore all data files
+Data/
+
+# Ignore all virtual environment files
+venv/
+
+# Ignore all log files
+*.log
+
+# Ignore all compiled Python files
+__pycache__/
+*.pyc
+
+# Ignore all Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore all MacOS system files
+.DS_Store
+
+# Ignore Figure 2 generated images
+Figure_2/
