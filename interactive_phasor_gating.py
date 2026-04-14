@@ -19,7 +19,7 @@ try:
     from PyQt5.QtCore import Qt
     from PyQt5.QtGui import QColor
     from PyQt5.QtWidgets import (QApplication, QColorDialog, QComboBox,
-                                 QFileDialog, QHBoxLayout, QLabel, QMainWindow,
+                                 QHBoxLayout, QLabel, QMainWindow,
                                  QMessageBox, QPushButton, QScrollArea,
                                  QSizePolicy, QVBoxLayout, QWidget)
 except ImportError:
@@ -27,7 +27,7 @@ except ImportError:
         from PyQt6.QtCore import Qt
         from PyQt6.QtGui import QColor
         from PyQt6.QtWidgets import (QApplication, QColorDialog, QComboBox,
-                                     QFileDialog, QHBoxLayout, QLabel,
+                                     QHBoxLayout, QLabel,
                                      QMainWindow, QMessageBox, QPushButton,
                                      QScrollArea, QSizePolicy, QVBoxLayout,
                                      QWidget)
@@ -495,16 +495,10 @@ class PhasorGatingWindow(QMainWindow):
 
     def on_export(self):
         """Export: phasor with all gates + one dot plot per gate (600 DPI)."""
-        try:
-            show_dirs = QFileDialog.ShowDirsOnly
-        except AttributeError:
-            show_dirs = QFileDialog.Option.ShowDirsOnly
-
-        save_dir = QFileDialog.getExistingDirectory(
-            self, "Select Directory to Save Plots", os.getcwd(), show_dirs
+        save_dir = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "results")
         )
-        if not save_dir:
-            return
+        os.makedirs(save_dir, exist_ok=True)
 
         try:
             base = os.path.splitext(self.filename)[0]
