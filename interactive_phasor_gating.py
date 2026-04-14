@@ -19,7 +19,7 @@ try:
     from PyQt5.QtCore import Qt
     from PyQt5.QtGui import QColor
     from PyQt5.QtWidgets import (QApplication, QColorDialog, QComboBox,
-                                 QFileDialog, QHBoxLayout, QLabel, QMainWindow,
+                                 QHBoxLayout, QLabel, QMainWindow,
                                  QMessageBox, QPushButton, QScrollArea,
                                  QSizePolicy, QVBoxLayout, QWidget)
 except ImportError:
@@ -27,7 +27,7 @@ except ImportError:
         from PyQt6.QtCore import Qt
         from PyQt6.QtGui import QColor
         from PyQt6.QtWidgets import (QApplication, QColorDialog, QComboBox,
-                                     QFileDialog, QHBoxLayout, QLabel,
+                                     QHBoxLayout, QLabel,
                                      QMainWindow, QMessageBox, QPushButton,
                                      QScrollArea, QSizePolicy, QVBoxLayout,
                                      QWidget)
@@ -48,6 +48,8 @@ GATE_COLORS = [
     "#fabed4",
     "#469990",
 ]
+
+DEFAULT_FCS_PATH = '../data/SFC/BAL/Ungated/Control 1.fcs'
 
 
 class PhasorGatingWindow(QMainWindow):
@@ -493,16 +495,10 @@ class PhasorGatingWindow(QMainWindow):
 
     def on_export(self):
         """Export: phasor with all gates + one dot plot per gate (600 DPI)."""
-        try:
-            show_dirs = QFileDialog.ShowDirsOnly
-        except AttributeError:
-            show_dirs = QFileDialog.Option.ShowDirsOnly
-
-        save_dir = QFileDialog.getExistingDirectory(
-            self, "Select Directory to Save Plots", os.getcwd(), show_dirs
+        save_dir = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "results")
         )
-        if not save_dir:
-            return
+        os.makedirs(save_dir, exist_ok=True)
 
         try:
             base = os.path.splitext(self.filename)[0]
@@ -659,14 +655,15 @@ class PhasorGatingTool:
 # ====================================================================== #
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        fcs_files = [f for f in os.listdir(".") if f.lower().endswith(".fcs")]
-        if not fcs_files:
-            print("Usage: python interactive_BAL_pregated.py <file.fcs>")
-            sys.exit(1)
-        fcs_path = fcs_files[0]
-    else:
+    if len(sys.argv) >= 2:
         fcs_path = sys.argv[1]
+    else:
+        fcs_path = DEFAULT_FCS_PATH
+
+    if not os.path.isfile(fcs_path):
+        print(f"Error: FCS file not found: {fcs_path}")
+        print("Usage: python interactive_phasor_gating.py <file.fcs>")
+        sys.exit(1)
 
     print(f"Loading {fcs_path} ...")
     tool = PhasorGatingTool(fcs_path, harmonic=1)
